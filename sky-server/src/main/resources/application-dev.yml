@@ -6,3 +6,8 @@ sky:
     database: sky_take_out
     username: root
     password: guo197268!
+  alioss:
+    endpoint: oss-us-west-1.aliyuncs.com
+    access-key-id: LTAI5tByvLAWx9yoCV2ERfve
+    access-key-secret: kn25yCIydsI5c1Ct8azJ0r9AAbCsaz
+    bucket-name: xigbucket
