@@ -104,11 +104,52 @@ public class DishServiceImpl implements DishService {
         //删除dish数据 and 删除相关的dishflavor数据
 //        for (Long id : ids) {
 //            dishMapper.deleteById(id);
-//            dishFlavorMapper.deleteByDishId(id);
+//           dishFlavorMapper.deleteByDishId(id);
 //        }
         //优化上述删除代码，sql批量删除
         dishMapper.deleteByIds(ids);
         dishFlavorMapper.deleteByDishIds(ids);
+
+    }
+
+    @Override
+    public DishVO getByIdWithFlavor(Long id) {
+
+        //查询dish表 及 flavor表 然后把数据封装到dishVo.
+
+        Dish dish = dishMapper.getById(id);
+
+        List<DishFlavor> dishFlavors =  dishFlavorMapper.getByDishId(id);
+
+        DishVO dishVO = new DishVO();
+
+        BeanUtils.copyProperties(dish,dishVO);
+
+        dishVO.setFlavors(dishFlavors);
+
+        return dishVO;
+    }
+
+    @Override
+    public void updateWithFlavor(DishDTO dishDTO) {
+
+        Dish dish  = new Dish();
+
+        BeanUtils.copyProperties(dishDTO,dish);
+        dishMapper.update(dish);
+
+        //flavor table 表的修改：先把原先的表全部删除，再按照user输入重新插入
+
+        dishFlavorMapper.deleteByDishId(dishDTO.getId());
+
+        List<DishFlavor>  dishFlavorList = dishDTO.getFlavors();
+
+        if (dishFlavorList != null && dishFlavorList.size() > 0){
+            dishFlavorList.forEach(dishFlavor -> {
+                dishFlavor.setDishId(dishDTO.getId());
+            });
+            dishFlavorMapper.insertBatch(dishFlavorList);
+        }
 
     }
 }
