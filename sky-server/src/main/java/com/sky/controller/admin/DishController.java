@@ -86,6 +86,7 @@ public class DishController {
 
     @PostMapping("/status/{status}")
     @ApiOperation("菜品的停售与起售")
+    // solved bug:菜品停售以后，关联的套餐也应该停售;
     public Result startOrStop(@PathVariable Integer status, Long id){
         log.info("菜品的停售与起售,{},{}",id,status);
         dishService.startOrStop(status,id);

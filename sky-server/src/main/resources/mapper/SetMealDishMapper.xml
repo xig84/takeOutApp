@@ -3,13 +3,42 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sky.mapper.SetMealDishMapper">
 
-
     <select id="getSetMealIdsByDishIds" resultType="java.lang.Long">
         select setmeal_id from setmeal_dish
         where dish_id in
         <foreach collection="dishIds" item="dishId" separator="," open="(" close=")">
             #{dishId}
         </foreach>
+    </select>
 
+    <insert id="insertBatch">
+        insert into setmeal_dish
+        (setmeal_id, dish_id, name, price, copies)
+        values
+        <foreach collection="setmealDishList" item="smdl" separator=",">
+            (#{smdl.setmealId},#{smdl.dishId},#{smdl.name},#{smdl.price},#{smdl.copies})
+        </foreach>
+    </insert>
+
+    <delete id="deleteBySetMealIds">
+        delete from setmeal_dish
+        where setmeal_dish.setmeal_id in
+        <foreach collection="setMealIds" item="setMealId" separator="," open="(" close=")" >
+            #{setmealId}
+        </foreach>
+
+    </delete>
+
+    <select id="getDishIdsBySetMealId" resultType="com.sky.entity.Dish">
+        select d.*
+        from setmeal_dish s
+        left outer join dish d on s.dish_id = d.id
+        where s.setmeal_id = #{id}
+        order by d.create_time desc
+    </select>
+    <select id="getSetmealDishsBySetmealId" resultType="com.sky.entity.SetmealDish">
+        select *
+        from setmeal_dish
+        where setmeal_id = #{setmealId}
     </select>
 </mapper>
