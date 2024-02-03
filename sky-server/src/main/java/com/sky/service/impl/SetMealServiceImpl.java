@@ -76,6 +76,8 @@ public class SetMealServiceImpl implements SetMealService {
         long total = page.getTotal();
         List<DishVO> records = page.getResult();
 
+
+
         return new PageResult(total,records);
 
     }
@@ -97,7 +99,7 @@ public class SetMealServiceImpl implements SetMealService {
 
         }
     }
-
+    
     /**
      * setmeal start or stop sell
      * @param status 1-在售 0-停售

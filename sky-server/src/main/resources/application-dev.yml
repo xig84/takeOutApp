@@ -11,3 +11,8 @@ sky:
     access-key-id: LTAI5tByvLAWx9yoCV2ERfve
     access-key-secret: kn25yCIydsI5c1Ct8azJ0r9AAbCsaz
     bucket-name: xigbucket
+  redis:
+    host: localhost
+    port: 6379
+    password: guo197268!
+    database: 10
