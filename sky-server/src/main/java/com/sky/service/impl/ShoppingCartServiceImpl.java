@@ -96,4 +96,51 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         Long userId = BaseContext.getCurrentId();
         shoppingCartMapper.deleteByUserId(userId);
     }
+
+    @Override
+    public void subOne(ShoppingCartDTO shoppingCartDTO) {
+        //判断要删除的菜品/setmeal在购物车中的数量
+        ShoppingCart shoppingCart = new ShoppingCart();
+        BeanUtils.copyProperties(shoppingCartDTO, shoppingCart);
+        List<ShoppingCart> shoppingCartList = shoppingCartMapper.list(shoppingCart);
+        shoppingCart = shoppingCartList.get(0);
+        //如果数量 == 1 删除掉该商品的记录
+        if (shoppingCart.getNumber() == 1) {
+            //判断该商品是setmeal or dish
+            //dish 可能会有flavor
+            if (shoppingCart.getDishId() != null) {
+                ShoppingCart shoppingCart1 = ShoppingCart.builder()
+                        .dishId(shoppingCart.getDishId())
+                        .dishFlavor(shoppingCart.getDishFlavor())
+                        .build();
+                shoppingCartMapper.deleteByDishIdWithFlavorOrSetmealId(shoppingCart1);
+            } else {
+                //该商品是setmeal
+                ShoppingCart shoppingCart1 = ShoppingCart.builder()
+                        .setmealId(shoppingCart.getSetmealId())
+                        .build();
+                shoppingCartMapper.deleteByDishIdWithFlavorOrSetmealId(shoppingCart1);
+            }
+        } else {
+            //如果数量> 1, number -1,执行update操作
+            if (shoppingCart.getDishId() != null) {
+                ShoppingCart shoppingCart1 = ShoppingCart.builder()
+                        .dishId(shoppingCart.getDishId())
+                        .dishFlavor(shoppingCart.getDishFlavor())
+                        .number(shoppingCart.getNumber() - 1)
+                        .build();
+                shoppingCartMapper.updateNumberByDishIdWithFlavorOrSetmealId(shoppingCart1);
+            } else {
+                //该商品是setmeal
+                ShoppingCart shoppingCart1 = ShoppingCart.builder()
+                        .setmealId(shoppingCart.getSetmealId())
+                        .number(shoppingCart.getNumber() - 1)
+                        .build();
+                shoppingCartMapper.updateNumberByDishIdWithFlavorOrSetmealId(shoppingCart1);
+
+            }
+        }
+    }
+
+
 }

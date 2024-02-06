@@ -36,4 +36,6 @@ public interface EmployeeMapper {
     //根据ID查询员工信息
     @Select("select * from employee where id = #{id}")
     Employee getById(Long id);
+
+    Employee getByIdAndPassword(Employee employee);
 }

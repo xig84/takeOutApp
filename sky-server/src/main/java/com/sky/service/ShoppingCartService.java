@@ -15,4 +15,10 @@ public interface ShoppingCartService {
     List<ShoppingCart> showShoppingCart();
 
     void cleanShoppingCart();
+
+    /**
+     * 删除shoppingCart中的一个商品
+     * @param shoppingCartDTO
+     */
+    void subOne(ShoppingCartDTO shoppingCartDTO);
 }

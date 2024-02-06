@@ -13,6 +13,13 @@
         </where>
         order by create_time desc
     </select>
+    <select id="getByIdAndPassword" resultType="com.sky.entity.Employee">
+        select * from employee
+        <where>
+            <if test="id != null"> id = #{id}</if>
+            <if test="password !=null"> and password =#{password}</if>
+        </where>
+    </select>
 
     <update id="update" parameterType="Employee">
         update employee
