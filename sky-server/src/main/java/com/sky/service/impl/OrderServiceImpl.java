@@ -188,7 +188,6 @@ public class OrderServiceImpl implements OrderService {
         map.put("content","orderNumber:"+ordersPaymentDTO.getOrderNumber());
         String json = JSONObject.toJSONString(map);
         webSocketServer.sendToAllClient(json);
-
     }
     @Override
     public PageResult pageQuery(OrdersPageQueryDTO ordersPageQueryDTO) {
@@ -203,14 +202,11 @@ public class OrderServiceImpl implements OrderService {
         if (page != null && page.getTotal() > 0) {
             for (Orders orders : page) {
                 Long orderId = orders.getId();// 订单id
-
                 // 查询订单明细
                 List<OrderDetail> orderDetails = orderDetailMapper.getByOrderId(orderId);
-
                 OrderVO orderVO = new OrderVO();
                 BeanUtils.copyProperties(orders, orderVO);
                 orderVO.setOrderDetailList(orderDetails);
-
                 list.add(orderVO);
             }
         }
@@ -222,9 +218,7 @@ public class OrderServiceImpl implements OrderService {
         //查询订单id 在order和order_detail中的数据
         Orders orders = orderMapper.getById(id);
         List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(id);
-
         OrderVO orderVO = new OrderVO();
-
         BeanUtils.copyProperties(orders,orderVO);
         orderVO.setOrderDetailList(orderDetailList);
         return orderVO;
@@ -239,12 +233,10 @@ public class OrderServiceImpl implements OrderService {
         //如果在待接单状态下取消订单，需要给用户退款
         //取消订单后需要将订单状态修改为“已取消”
         Orders order = orderMapper.getById(id);
-
         //检查订单是否存在
         if (order == null) {
             throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
         }
-
         // 1待付款 2待接单  3已接单 4派送中 5已完成 6已取消 只要 1 2能取消
         if (order.getStatus() > 2) {
             throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
@@ -269,19 +261,15 @@ public class OrderServiceImpl implements OrderService {
 
         // 查询当前用户id
         Long userId = BaseContext.getCurrentId();
-
         // 根据订单id查询当前订单详情
         List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(id);
-
         // 将订单详情对象转换为购物车对象
         List<ShoppingCart> shoppingCartList = orderDetailList.stream().map(x -> {
             ShoppingCart shoppingCart = new ShoppingCart();
-
             // 将原订单详情里面的菜品信息重新复制到购物车对象中
             BeanUtils.copyProperties(x, shoppingCart, "id");
             shoppingCart.setUserId(userId);
             shoppingCart.setCreateTime(LocalDateTime.now());
-
             return shoppingCart;
         }).collect(Collectors.toList());
 
@@ -474,5 +462,29 @@ public class OrderServiceImpl implements OrderService {
         orders.setDeliveryTime(LocalDateTime.now());
 
         orderMapper.update(orders);
+    }
+
+
+    /**
+     * 客户催单
+     * @param id
+     */
+    @Override
+    public void reminder(Long id) {
+
+        // 根据id查询订单
+        Orders ordersDB = orderMapper.getById(id);
+
+        // 校验订单是否存在
+        if (ordersDB == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        Map map = new HashMap();
+        map.put("type",2); // 1-来单提醒 2-客户催单
+        map.put("orderId",id);
+        map.put("content","orderNumber:"+ordersDB.getNumber());
+        String json = JSONObject.toJSONString(map);
+        webSocketServer.sendToAllClient(json);
+
     }
 }
