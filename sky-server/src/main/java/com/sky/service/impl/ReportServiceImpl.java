@@ -5,10 +5,13 @@ import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
+import com.sky.vo.OrderReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
+import io.swagger.models.auth.In;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
@@ -101,6 +104,51 @@ public class ReportServiceImpl implements ReportService {
         return UserReportVO.builder()
                 .newUserList(StringUtils.join(newUserList,','))
                 .totalUserList(StringUtils.join(totalUserList,","))
+                .dateList(StringUtils.join(dateList,","))
+                .build();
+    }
+
+    @Override
+    public OrderReportVO getOrdersStatistics(LocalDate begin, LocalDate end) {
+
+        List<LocalDate> dateList = new ArrayList<>();
+        dateList.add(begin);
+        while(!begin.equals(end)) {
+            //日期计算
+            begin = begin.plusDays(1);
+            dateList.add(begin);
+        }
+        List<Integer> orderCountrList = new ArrayList<>();
+        List<Integer> vaildorderCountList = new ArrayList<>();
+        for (LocalDate date : dateList) {
+            LocalDateTime beginTime = LocalDateTime.of(date, LocalTime.MIN);
+            LocalDateTime endTime = LocalDateTime.of(date, LocalTime.MAX);
+            //查询每天订单总数
+            //查询每天有效订单数
+            Map map = new HashMap<>();
+            map.put("end",endTime);
+            map.put("begin",beginTime);
+            Integer orderCount = orderMapper.countByMap(map);
+            map.put("status", Orders.COMPLETED);
+            Integer vaildOrderCount = orderMapper.countByMap(map);
+            orderCountrList.add(orderCount);
+            vaildorderCountList.add(vaildOrderCount);
+        }
+        Integer totalOrderCount = orderCountrList.stream().reduce(Integer::sum).get();
+        Integer validOrderCount = vaildorderCountList.stream().reduce(Integer::sum).get();
+
+        Double orderCompletionRate = 0.0;
+        if (totalOrderCount!= 0){
+            orderCompletionRate =validOrderCount.doubleValue() / totalOrderCount;
+        }
+
+
+        return OrderReportVO.builder()
+                .orderCompletionRate(orderCompletionRate)
+                .totalOrderCount(totalOrderCount)
+                .validOrderCount(validOrderCount)
+                .validOrderCountList(StringUtils.join(vaildorderCountList,","))
+                .orderCountList(StringUtils.join(orderCountrList,","))
                 .dateList(StringUtils.join(dateList,","))
                 .build();
     }
