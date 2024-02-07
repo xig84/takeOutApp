@@ -3,8 +3,10 @@ package com.sky.service.impl;
 
 import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
+import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
 import com.sky.vo.TurnoverReportVO;
+import com.sky.vo.UserReportVO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,8 @@ import java.util.Map;
 public class ReportServiceImpl implements ReportService {
 
 
+    @Autowired
+    private UserMapper userMapper;
 
     @Autowired
     private OrderMapper orderMapper;
@@ -64,5 +68,40 @@ public class ReportServiceImpl implements ReportService {
 
         return turnoverReportVO;
 
+    }
+
+    @Override
+    public UserReportVO getUserStatistics(LocalDate begin, LocalDate end) {
+
+        List<LocalDate> dateList = new ArrayList<>();
+
+        dateList.add(begin);
+        while(!begin.equals(end)) {
+            //日期计算
+            begin = begin.plusDays(1);
+            dateList.add(begin);
+        }
+
+        List<Integer> newUserList = new ArrayList<>();
+        List<Integer> totalUserList = new ArrayList<>();
+
+        for (LocalDate date : dateList) {
+            LocalDateTime beginTime = LocalDateTime.of(date, LocalTime.MIN);
+            LocalDateTime endTime = LocalDateTime.of(date, LocalTime.MAX);
+            //select count(*) from users where create_time > ? and create_time<?
+            Map map = new HashMap<>();
+            map.put("end",endTime);
+            Integer totalUser = userMapper.countByMap(map);
+            map.put("begin",beginTime);
+            Integer newUSer = userMapper.countByMap(map);
+            totalUserList.add(totalUser);
+            newUserList.add(newUSer);
+        }
+
+        return UserReportVO.builder()
+                .newUserList(StringUtils.join(newUserList,','))
+                .totalUserList(StringUtils.join(totalUserList,","))
+                .dateList(StringUtils.join(dateList,","))
+                .build();
     }
 }
