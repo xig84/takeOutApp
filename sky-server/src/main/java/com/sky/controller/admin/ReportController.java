@@ -1,9 +1,8 @@
 package com.sky.controller.admin;
-
-
 import com.sky.result.Result;
 import com.sky.service.ReportService;
 import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import io.swagger.annotations.Api;
@@ -16,8 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 @RestController
 @RequestMapping("/admin/report")
 @Api(tags = "数据统计相关接口")
@@ -58,6 +55,16 @@ public class ReportController {
         OrderReportVO orderReportVO = reportService.getOrdersStatistics(begin,end);
 
         return Result.success(orderReportVO);
+    }
+
+    @ApiOperation("销量排名top10统计")
+    @GetMapping("/top10")
+    public Result<SalesTop10ReportVO> top10(
+            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
+            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end){
+        SalesTop10ReportVO salesTop10ReportVO = reportService.getSalesTop10(begin,end);
+
+        return Result.success(salesTop10ReportVO);
     }
 
 }
