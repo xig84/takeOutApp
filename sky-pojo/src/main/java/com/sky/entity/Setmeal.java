@@ -1,5 +1,6 @@
 package com.sky.entity;
 
+import io.swagger.models.auth.In;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Setmeal implements Serializable {
 
+    public static final  Integer ON_SALE = 1;
+    public  static  final Integer DIS_CONTINUTED = 0;
     private static final long serialVersionUID = 1L;
 
     private Long id;

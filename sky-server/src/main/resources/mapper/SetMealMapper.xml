@@ -71,5 +71,10 @@
             </if>
         </where>
     </select>
+    <select id="countByStatus" resultType="java.lang.Integer">
+        select count(id)
+        from setmeal
+        where status = #{status}
+    </select>
 
 </mapper>

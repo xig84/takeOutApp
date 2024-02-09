@@ -174,5 +174,6 @@ public class ReportServiceImpl implements ReportService {
                 .nameList(StringUtils.join(nameList,","))
                 .numberList(StringUtils.join(numberList,","))
                 .build();
+        
     }
 }

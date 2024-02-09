@@ -57,5 +57,5 @@ public interface SetMealMapper {
     List<DishItemVO> getDishItemBySetmealId(Long setmealId);
 
 
-
+    Integer countByStatus(Integer status);
 }

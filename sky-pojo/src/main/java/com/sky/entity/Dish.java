@@ -17,6 +17,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Dish implements Serializable {
 
+    public  static  final  Integer DIS_CONTINUTED = 0;
+    public static  final Integer ON_SALE = 1;
+
     private static final long serialVersionUID = 1L;
 
     private Long id;
